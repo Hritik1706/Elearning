@@ -1,0 +1,53 @@
+version: '3'
+services:
+  mongo:
+    image: mongo
+    restart: unless-stopped
+    environment:
+      - MONGO_ROOT_USERNAME=your_root_user
+      - MONGO_ROOT_PASSWORD=your_root_password
+    ports:
+      - '27017:27017'
+    networks:
+      - shared-network
+
+  cache:
+    image: redis:6.2-alpine
+    restart: unless-stopped
+    ports:
+      - '36867:36867'
+    command: redis-server --save 20 1 --loglevel warning --requirepass your_secret_key
+    networks:
+      - shared-network
+
+  server:
+    container_name: server
+    restart: unless-stopped
+    image: server:1
+    build:
+      context: server
+      dockerfile: Dockerfile
+    ports:
+      - '8000:8000'
+    networks:
+      - shared-network
+    depends_on:
+      - mongo
+      - cache
+
+  client:
+    container_name: client
+    restart: unless-stopped
+    image: client:1
+    build:
+      context: client
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    networks:
+      - shared-network
+    depends_on:
+      - server
+
+networks:
+  shared-network:
