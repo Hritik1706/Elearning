@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elearning-server
+  namespace: workshop
+  labels:
+    app: elearning-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elearning-server
+  template:
+    metadata:
+      labels:
+        app: elearning-server
+    spec:
+      containers:
+      - name: elearning-server
+        image: hritik1706/elearning-server
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        env:
+          - name: MONGO_URI
+            value: "mongodb://$(MONGO_ROOT_USERNAME):$(MONGO_ROOT_PASSWORD)@mongo-service:27017"
+          - name: MONGO_ROOT_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: db-secrets
+                key: mongo-root-username
+          - name: MONGO_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: db-secrets
+                key: mongo-root-password
