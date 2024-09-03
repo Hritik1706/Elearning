@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elearning-client
+  namespace: workshop
+  labels:
+    app: elearning-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elearning-client
+  template:
+    metadata:
+      labels:
+        app: elearning-client
+    spec:
+      containers:
+      - name: elearning-client
+        image: hritik1706/elearning-client
+        ports:
+          - containerPort: 3000
